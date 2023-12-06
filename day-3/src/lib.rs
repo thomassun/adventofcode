@@ -13,10 +13,10 @@ pub fn find_intersection(combines: (&str, &str)) -> String {
         .into_iter()
         .fold("".to_owned(), |acc, c| format!("{}{}", acc, c))
 }
-pub fn priority_of_item(i: &char) -> usize {
+pub fn priority_of_item(i: &char) -> u32 {
     match i {
-        'a'..='z' => (*i as usize) - ('a' as usize) + 1,
-        'A'..='Z' => (*i as usize) - ('A' as usize) + 27,
+        'a'..='z' => (*i as u32) - ('a' as u32) + 1,
+        'A'..='Z' => (*i as u32) - ('A' as u32) + 27,
         _ => panic!("Not implemented"),
     }
 }
