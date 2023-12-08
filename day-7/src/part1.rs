@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let size = caps.get(0).unwrap().as_str().parse::<usize>().unwrap();
             let new_file = FS::File {
                 name: file_name.to_owned(),
-                size: size,
+                size,
             };
             if let Some(FS::Dir { sub_dir, .. }) = cwd_item {
                 sub_dir.push(new_file);

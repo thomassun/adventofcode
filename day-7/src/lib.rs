@@ -67,7 +67,7 @@ pub enum FS {
 }
 
 pub fn find_item<'a>(root: &'a mut FS, path: &MyPath) -> Option<&'a mut FS> {
-    // let paths = ["/","/abc/","/abc/def/"]
+    // let paths = ["/","/abc","/abc/def"]
     let paths = path.destrct();
     if let FS::Dir { name, .. } = root {
         if name.as_str() == path.as_str() {
@@ -75,15 +75,15 @@ pub fn find_item<'a>(root: &'a mut FS, path: &MyPath) -> Option<&'a mut FS> {
         }
     }
     let mut cwd = Some(root);
-    for target in paths {
+    for target in paths[1..].iter() {
         if let Some(FS::Dir {
-            name,
+            name: _,
             ref mut sub_dir,
         }) = cwd
         {
             cwd = sub_dir.iter_mut().find(|f| {
                 if let FS::Dir { name, .. } = f {
-                    name == &target
+                    name == target
                 } else {
                     false
                 }
@@ -134,5 +134,72 @@ mod tests {
         path = path.go_down("c");
         assert_eq!(path.as_str(), "/a/b/c");
         assert_eq!(path.destrct(), vec!["/", "/a", "/a/b", "/a/b/c"])
+    }
+    #[test]
+    fn filesystem() {
+        let mut fs = FS::Dir {
+            name: "/".to_owned(),
+            sub_dir: vec![FS::Dir {
+                name: "/a".to_owned(),
+                sub_dir: vec![FS::Dir {
+                    name: "/a/b".to_owned(),
+                    sub_dir: vec![
+                        FS::File {
+                            name: "xcv".to_owned(),
+                            size: 33,
+                        },
+                        FS::File {
+                            name: "abc".to_owned(),
+                            size: 313,
+                        },
+                        FS::File {
+                            name: "def".to_owned(),
+                            size: 55,
+                        },
+                        FS::Dir {
+                            name: "/a/b/z".to_owned(),
+                            sub_dir: vec![],
+                        },
+                        FS::Dir {
+                            name: "/a/b/c".to_owned(),
+                            sub_dir: vec![
+                                FS::File {
+                                    name: "aa.txt".to_owned(),
+                                    size: 1311,
+                                },
+                                FS::File {
+                                    name: "bb.txt".to_owned(),
+                                    size: 1131,
+                                },
+                                FS::File {
+                                    name: "cc.txt".to_owned(),
+                                    size: 1111,
+                                },
+                            ],
+                        },
+                        FS::File {
+                            name: "ZZZ".to_owned(),
+                            size: 199,
+                        },
+                        FS::File {
+                            name: "YYYS".to_owned(),
+                            size: 199,
+                        },
+                    ],
+                }],
+            }],
+        };
+        let path = MyPath::new().go_down("a").go_down("b").go_down("c");
+        assert!(find_item(&mut fs, &path).is_some());
+        let path = path.go_next("z");
+        assert!(find_item(&mut fs, &path).is_some());
+        let path = path.go_up();
+        assert!(find_item(&mut fs, &path).is_some());
+        let path = path.go_up();
+        assert!(find_item(&mut fs, &path).is_some());
+        let path = path.go_next("x");
+        assert!(find_item(&mut fs, &path).is_none());
+        let path = MyPath::new();
+        assert!(find_item(&mut fs, &path).is_some());
     }
 }
