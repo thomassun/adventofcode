@@ -1,29 +1,61 @@
 #![allow(clippy::new_without_default)]
 
-use std::borrow::BorrowMut;
-
 pub struct MyPath(String);
 impl MyPath {
     pub fn new() -> Self {
         MyPath("/".to_owned())
     }
     pub fn go_up(&self) -> MyPath {
-        if self.0 == "/" {
+        // from /a/b/c -> /a/b
+        if self.is_root() {
             MyPath("/".to_owned())
         } else {
-            let path = &self.0;
-            MyPath(path.to_owned())
+            // /a/b/c
+            // /a
+            // /
+            let path = &self.0.split('/').filter(|c| c != &"").collect::<Vec<_>>();
+            if path.len() == 1 {
+                MyPath("/".to_owned())
+            } else {
+                let parent = path[..path.len() - 1].join("/");
+                MyPath("/".to_owned() + &parent)
+            }
         }
     }
-    pub fn destrct(&self) -> Vec<&str> {
-        todo!()
+    pub fn destrct(&self) -> Vec<String> {
+        //from /a/b/c -> ["/","/a","/a/b","/a/b/c"]
+        let path = &self.0.split('/').filter(|c| c != &"").collect::<Vec<_>>();
+        let mut result = vec![];
+        result.push("/".to_owned());
+        // let mut n = 0;
+        for (n, p) in path.iter().enumerate() {
+            if n == 0 {
+                result.push(result[n].to_owned() + p);
+            } else {
+                result.push(result[n].to_owned() + "/" + p);
+            }
+        }
+        result
+    }
+    pub fn is_root(&self) -> bool {
+        self.0 == "/"
     }
     pub fn go_down(&self, target: &str) -> MyPath {
-        target.to_owned();
-        todo!()
+        // from /a/b/c -> /a/b/c/d
+        let current = self.0.to_owned();
+        if self.is_root() {
+            MyPath(current + target)
+        } else {
+            MyPath(current + "/" + target)
+        }
     }
     pub fn go_next(&self, target: &str) -> MyPath {
-        todo!()
+        // from /a/b/c -> /a/b/d
+        if self.is_root() {
+            MyPath("/".to_owned())
+        } else {
+            self.go_up().go_down(target)
+        }
     }
     pub fn as_str(&self) -> &str {
         &self.0
@@ -51,7 +83,7 @@ pub fn find_item<'a>(root: &'a mut FS, path: &MyPath) -> Option<&'a mut FS> {
         {
             cwd = sub_dir.iter_mut().find(|f| {
                 if let FS::Dir { name, .. } = f {
-                    name == target
+                    name == &target
                 } else {
                     false
                 }
@@ -64,7 +96,43 @@ pub fn find_item<'a>(root: &'a mut FS, path: &MyPath) -> Option<&'a mut FS> {
     }
     cwd
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-fn destruct_path(path: &str) -> Vec<&str> {
-    todo!()
+    #[test]
+    fn test_path() {
+        let mut path = MyPath::new();
+        assert!(path.is_root());
+        path = path.go_up();
+        assert_eq!(path.as_str(), "/");
+        path = path.go_down("a");
+        assert_eq!(path.as_str(), "/a");
+        path = path.go_down("b");
+        assert_eq!(path.as_str(), "/a/b");
+        path = path.go_down("c");
+        assert_eq!(path.as_str(), "/a/b/c");
+        path = path.go_next("d");
+        assert_eq!(path.as_str(), "/a/b/d");
+        path = path.go_up();
+        assert_eq!(path.as_str(), "/a/b");
+        path = path.go_up();
+        assert_eq!(path.as_str(), "/a");
+        path = path.go_up();
+        assert_eq!(path.as_str(), "/");
+        path = path.go_up();
+        assert_eq!(path.as_str(), "/");
+        path = path.go_next("s");
+        assert_eq!(path.as_str(), "/");
+        path = path.go_down("a");
+        assert_eq!(path.as_str(), "/a");
+        path = path.go_next("s");
+        assert_eq!(path.as_str(), "/s");
+        path = MyPath::new();
+        path = path.go_down("a");
+        path = path.go_down("b");
+        path = path.go_down("c");
+        assert_eq!(path.as_str(), "/a/b/c");
+        assert_eq!(path.destrct(), vec!["/", "/a", "/a/b", "/a/b/c"])
+    }
 }
