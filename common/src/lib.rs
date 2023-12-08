@@ -1,14 +1,12 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::{fs, io::Error};
+
+pub fn get_lines_from_file(path: &str) -> Result<Vec<String>, Error> {
+    let contents = fs::read_to_string(path)?;
+
+    todo!()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 }

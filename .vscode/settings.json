@@ -1,0 +1,7 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./day-7/Cargo.toml",
+        "./day-7/Cargo.toml"
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false
+}

@@ -42,13 +42,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     for instruction in instructions {
         let (steps, from, to) = instruction;
+        let mut taken = vec![];
         for _ in 0..steps {
             if let Some(c) = stacks[from - 1].pop() {
-                stacks[to - 1].push(c);
+                taken.insert(0, c);
             } else {
                 panic!("try to move from a empty stack{from}");
             }
         }
+        stacks[to - 1].append(&mut taken);
     }
     println!("{:?}", stacks);
     let mut result = vec![];
