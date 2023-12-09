@@ -1,5 +1,3 @@
-use core::num;
-
 fn main() {
     let lines = include_str!("../data/input.txt").lines();
     let mut matrix: Vec<Vec<u8>> = vec![];
