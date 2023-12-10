@@ -33,6 +33,9 @@ fn part_two(matrix: &Vec<Vec<u8>>) -> usize {
     let mut max = 0;
     for y in 1..matrix.len() - 1 {
         for x in 1..matrix[0].len() - 1 {
+            if matrix[y][x] < 2 {
+                continue;
+            }
             let up = look_up_scenic(matrix, x, y);
             let down = look_down_scenic(matrix, x, y);
             let left = look_left_scenic(matrix, x, y);
