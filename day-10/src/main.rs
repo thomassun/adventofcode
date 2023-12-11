@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    iter,
+};
 
 const KEY_CYCLE: [i32; 6] = [20, 60, 100, 140, 180, 220];
 fn main() {
@@ -42,60 +45,27 @@ fn main() {
             .fold(0, |acc, kv| { acc + kv.0 * kv.1 })
     );
     let part_two = part2();
-    part_two.chars().enumerate().for_each(|(i, c)| {
-        if i % 40 == 39 {
-            println!("{c}");
-        } else {
-            print!("{c}");
-        }
-    });
+    part_two.chunks(40).for_each(|chunk| {
+        println!("{}", chunk.iter().collect::<String>());
+    })
     // println!("Part Two:{}", &part2()[..8]);
 }
 //Part TWO
-fn part2() -> String {
-    let mut lines = include_str!("../data/input.txt").lines();
-    let mut cycle = 0_i32;
-    let mut sprite = 1;
-    let mut screen = HashSet::new();
-    // let mut row = 0;
-    // screen.fill(b'.');
-    while let Some(instr) = lines
-        .next()
-        .map(|l| l.split_whitespace().collect::<Vec<_>>())
-        .as_deref()
-    {
-        match instr {
-            ["noop"] => {
-                cycle += 1;
-                // row = cycle % 40;
-                if (sprite - 1..=sprite + 1).contains(&((cycle - 1) % 40)) {
-                    // if (sprite - 1..=sprite + 1).contains(&(cycle - 1)) {
-                    screen.insert(cycle - 1);
-                }
-            }
-            ["addx", number] => {
-                cycle += 1;
-                // row = cycle % 40;
-                if (sprite - 1..=sprite + 1).contains(&((cycle - 1) % 40)) {
-                    // if (sprite - 1..=sprite + 1).contains(&(cycle - 1)) {
-                    screen.insert(cycle - 1);
-                    // screen.insert(cycle - 1);
-                }
-                cycle += 1;
-                // row = cycle % 40;
-                if (sprite - 1..=sprite + 1).contains(&((cycle - 1) % 40)) {
-                    screen.insert(cycle - 1);
-                    // screen.insert(cycle - 1);
-                }
-
-                sprite += number.parse::<i32>().unwrap();
-            }
-            _ => (),
+fn part2() -> Vec<char> {
+    let (mut c, mut s, mut screen) = (0_i32, 1, Vec::with_capacity(40 * 6));
+    for instr in include_str!("../data/input.txt").lines() {
+        let dot = ((s - 1 <= c % 40 && s + 1 >= c % 40) as u8 * 3 + 32) as char;
+        // ' '(space) = 32; '#' = 35
+        screen.push(dot);
+        c += 1;
+        if &instr[..4] == "addx" {
+            let dot = ((s - 1 <= c % 40 && s + 1 >= c % 40) as u8 * 3 + 32) as char;
+            screen.push(dot);
+            c += 1;
+            s += instr[5..].parse::<i32>().unwrap();
         }
     }
     // println!("Part Two:{:?}", screen);
 
-    let mut output = std::iter::repeat('.').take(40 * 6).collect::<Vec<char>>();
-    screen.into_iter().for_each(|n| output[n as usize] = '#');
-    output.into_iter().collect::<String>()
+    screen
 }
