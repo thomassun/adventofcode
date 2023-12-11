@@ -1,54 +1,36 @@
-use std::{
-    collections::{HashMap, HashSet},
-    iter,
-};
+use std::collections::HashMap;
 
 const KEY_CYCLE: [i32; 6] = [20, 60, 100, 140, 180, 220];
 fn main() {
     //Part one
     let mut lines = include_str!("../data/input.txt").lines();
-    let mut cycle = 0_i32;
-    let mut value = 1;
-    let mut value_at = HashMap::new();
+    let (mut c, mut v, mut v_at) = (0_i32, 1, HashMap::new());
     while let Some(instr) = lines
         .next()
         .map(|l| l.split_whitespace().collect::<Vec<_>>())
         .as_deref()
     {
-        match instr {
-            ["noop"] => {
-                cycle += 1;
-                if KEY_CYCLE.contains(&cycle) {
-                    println!("{value},{:?}", value_at.insert(cycle, value));
-                }
+        c += 1;
+        if KEY_CYCLE.contains(&c) {
+            println!("{v},{:?}", v_at.insert(c, v));
+        }
+        if let ["addx", number] = instr {
+            c += 1;
+            if KEY_CYCLE.contains(&c) {
+                v_at.insert(c, v);
             }
-            ["addx", number] => {
-                cycle += 1;
-                if KEY_CYCLE.contains(&cycle) {
-                    value_at.insert(cycle, value);
-                }
-                cycle += 1;
-                if KEY_CYCLE.contains(&cycle) {
-                    value_at.insert(cycle, value);
-                }
 
-                value += number.parse::<i32>().unwrap();
-            }
-            _ => (),
+            v += number.parse::<i32>().unwrap();
         }
     }
-    // println!("{:?}", value_at);
     println!(
         "Part One:{:?}",
-        value_at
-            .into_iter()
-            .fold(0, |acc, kv| { acc + kv.0 * kv.1 })
+        v_at.into_iter().fold(0, |acc, kv| { acc + kv.0 * kv.1 })
     );
     let part_two = part2();
     part_two.chunks(40).for_each(|chunk| {
         println!("{}", chunk.iter().collect::<String>());
     })
-    // println!("Part Two:{}", &part2()[..8]);
 }
 //Part TWO
 fn part2() -> Vec<char> {
@@ -65,7 +47,6 @@ fn part2() -> Vec<char> {
             s += instr[5..].parse::<i32>().unwrap();
         }
     }
-    // println!("Part Two:{:?}", screen);
 
     screen
 }
