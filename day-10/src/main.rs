@@ -47,6 +47,5 @@ fn part2() -> Vec<char> {
             s += instr[5..].parse::<i32>().unwrap();
         }
     }
-
     screen
 }
