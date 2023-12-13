@@ -29,8 +29,8 @@ fn main() {
         .collect::<Vec<_>>();
 
     let mut bags = vec![vec![]; monkies.len()];
-    // let mo: usize = monkies.iter().map(|m| m.div).product();
-    (0..20).for_each(|_| {
+    //let mo: usize = monkies.iter().map(|m| m.div).product();
+    (0..10_000).for_each(|_| {
         monkies.iter_mut().enumerate().for_each(|(i, m)| {
             m.bag.append(&mut bags[i]);
             m.bag.drain(0..).for_each(|mut n| {

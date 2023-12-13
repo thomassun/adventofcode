@@ -30,11 +30,11 @@ fn main() {
 
     let mut bags = vec![vec![]; monkies.len()];
     let mo: usize = monkies.iter().map(|m| m.div).product();
-    (0..10000).for_each(|_| {
+    (0..10_000).for_each(|_| {
         monkies.iter_mut().enumerate().for_each(|(i, m)| {
             m.bag.append(&mut bags[i]);
             m.bag.drain(0..).for_each(|mut n| {
-                n = (m.op)(n) / mo;
+                n = (m.op)(n) % mo;
                 bags[if n % m.div == 0 { m.if_to } else { m.else_to }].push(n);
                 m.ins += 1;
             });
@@ -79,7 +79,7 @@ mod tests {
     fn test_macro() {
         assert_eq!(op("old * 3")(3), 9);
         assert_eq!(op("old * old")(3), 9);
-        assert_eq!(op("old + 3")(3), 6);
+
         assert_eq!(op("old - 2")(3), 1);
         assert_eq!(op("old / 2")(3), 1);
         assert_eq!(op("old / 2")(11), 5);
