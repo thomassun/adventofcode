@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["day-*", "common", "day12"]
+members = ["day-*", "common" ]
 [workspace.dependencies]
 common = { path = "./common" }
 regex = "1.10.2"
