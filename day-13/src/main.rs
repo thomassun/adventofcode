@@ -7,13 +7,12 @@ fn compair(left: &str, right: &str) -> bool {
         return true;
     }
 
-    if left.len() =="[]" and right.len() ==0{
+    if left.len() == "[]" && right.len() == 0 {
         return false;
     }
-    if left.len() =="[]" and right.contains("["){
+    if left.len() == "[]" && right.contains("[") {
         return true;
     }
-
 }
 #[cfg(test)]
 mod tests {
