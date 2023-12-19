@@ -8,6 +8,7 @@ use nom::{character::complete::digit1, sequence::separated_pair};
 fn main() {
     let input = include_str!("../data/input.txt");
     println!("part one:{}", part1(input));
+    println!("part two:{}", part2(input));
     // let result = parse(input) ;
 }
 fn part1(input: &str) -> usize {
@@ -20,11 +21,63 @@ fn part1(input: &str) -> usize {
             let down = (sand.0, sand.1 + 1);
             let left = (sand.0 - 1, sand.1 + 1);
             let right = (sand.0 + 1, sand.1 + 1);
-            if down.1 > max_depth {
+            if sand.1 > max_depth {
                 break;
             }
 
             sand = match (board.get(&down), board.get(&left), board.get(&right)) {
+                (None, _, _) => down,
+                (_, None, _) => left,
+                (_, _, None) => right,
+                (Some(_), Some(_), Some(_)) => {
+                    board.insert(sand);
+                    cnt += 1;
+                    (500, 0)
+                }
+            }
+        }
+    }
+    cnt
+}
+fn part2(input: &str) -> usize {
+    let mut cnt = 0;
+    if let Ok(data) = parse(input) {
+        let mut board = board(data.1);
+        let mut rocks_vec = board.iter().collect::<Vec<_>>();
+        rocks_vec.sort_by(|a, b| a.1.cmp(&b.1));
+        let lowest = **rocks_vec.last().unwrap();
+        let mut sand = (500, 0);
+        while board.get(&(500, 0)).is_none() {
+            let down = (sand.0, sand.1 + 1);
+            let left = (sand.0 - 1, sand.1 + 1);
+            let right = (sand.0 + 1, sand.1 + 1);
+            // if sand.1 > lowest.1 + 2 {
+            //     break;
+            // }
+            //
+            sand = match (
+                board.get(&down).or({
+                    if down.1 == lowest.1 + 2 {
+                        Some(&lowest)
+                    } else {
+                        None
+                    }
+                }),
+                board.get(&left).or({
+                    if left.1 == lowest.1 + 2 {
+                        Some(&lowest)
+                    } else {
+                        None
+                    }
+                }),
+                board.get(&right).or({
+                    if right.1 == lowest.1 + 2 {
+                        Some(&lowest)
+                    } else {
+                        None
+                    }
+                }),
+            ) {
                 (None, _, _) => down,
                 (_, None, _) => left,
                 (_, _, None) => right,
