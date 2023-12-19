@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::usize;
 
 use nom::combinator::map_res;
 use nom::multi::separated_list1;
@@ -6,14 +7,37 @@ use nom::{bytes::complete::tag, IResult};
 use nom::{character::complete::digit1, sequence::separated_pair};
 fn main() {
     let input = include_str!("../data/input.txt");
+    println!("part one:{}", part1(input));
     // let result = parse(input) ;
-    if let Ok(data) = parse(input) {
-        let board = board(data.1);
-        let max_depth = board.iter().fold(0, |max, rock| max.max(rock.1));
-        println!("{}", max_depth);
-    }
 }
+fn part1(input: &str) -> usize {
+    let mut cnt = 0;
+    if let Ok(data) = parse(input) {
+        let mut board = board(data.1);
+        let max_depth = board.iter().fold(0, |max, rock| max.max(rock.1));
+        let mut sand = (500, 0);
+        loop {
+            let down = (sand.0, sand.1 + 1);
+            let left = (sand.0 - 1, sand.1 + 1);
+            let right = (sand.0 + 1, sand.1 + 1);
+            if down.1 > max_depth {
+                break;
+            }
 
+            sand = match (board.get(&down), board.get(&left), board.get(&right)) {
+                (None, _, _) => down,
+                (_, None, _) => left,
+                (_, _, None) => right,
+                (Some(_), Some(_), Some(_)) => {
+                    board.insert(sand);
+                    cnt += 1;
+                    (500, 0)
+                }
+            }
+        }
+    }
+    cnt
+}
 fn parse(input: &str) -> IResult<&str, Vec<Vec<(usize, usize)>>> {
     separated_list1(
         tag("\n"),
