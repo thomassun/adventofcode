@@ -1,10 +1,9 @@
 use std::collections::HashSet;
 use std::usize;
 
-use nom::combinator::map_res;
-use nom::multi::separated_list1;
 use nom::{bytes::complete::tag, IResult};
 use nom::{character::complete::digit1, sequence::separated_pair};
+use nom::{combinator::map_res, multi::separated_list1};
 fn main() {
     let input = include_str!("../data/input.txt");
     println!("part one:{}", part1(input));
